@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GhostBusters-PC | Dashboard</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-color: #03050a;
+      --panel-bg: rgba(10, 15, 30, 0.55);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent-cyan: #06b6d4;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --accent-red-glow: rgba(239, 68, 68, 0.25);
+      --accent-cyan-glow: rgba(6, 182, 212, 0.25);
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      font-family: var(--font-family);
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+    }
+
+    /* Global Liquid Background Swirl (Axiom Style) */
+    .liquid-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 0;
+      background-color: var(--bg-color);
+      pointer-events: none;
+    }
+
+    .blob {
+      position: absolute;
+      filter: blur(120px);
+      border-radius: 50%;
+      opacity: 0;
+      mix-blend-mode: screen;
+      will-change: transform, opacity;
+      transition: opacity 1.5s ease-in;
+    }
+
+    .liquid-bg.show .blob {
+      opacity: 0.75;
+    }
+
+    .blob-1 {
+      width: 50vw;
+      height: 50vw;
+      max-width: 600px;
+      max-height: 600px;
+      background: var(--accent-cyan);
+      animation: swirl 12s infinite linear;
+    }
+
+    .blob-2 {
+      width: 60vw;
+      height: 60vw;
+      max-width: 800px;
+      max-height: 800px;
+      background: #4f46e5;
+      animation: swirl 16s infinite linear reverse;
+      transform-origin: 200px 200px;
+    }
+
+    .blob-3 {
+      width: 45vw;
+      height: 45vw;
+      max-width: 500px;
+      max-height: 500px;
+      background: #0891b2;
+      animation: swirl 14s infinite ease-in-out;
+      transform-origin: -150px -100px;
+    }
+
+    @keyframes swirl {
+      0% { transform: rotate(0deg) translate(80px) scale(1); }
+      50% { transform: rotate(180deg) translate(100px) scale(1.1); }
+      100% { transform: rotate(360deg) translate(80px) scale(1); }
+    }
+
+    .glass-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      backdrop-filter: blur(50px);
+      -webkit-backdrop-filter: blur(50px);
+      background: rgba(3, 5, 10, 0.72);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Single Page App Layers (Axiom Style) */
+    .layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 10;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      background-color: transparent;
+      overflow: hidden;
+    }
+
+    .layer.active {
+      opacity: 1;
+      pointer-events: all;
+      z-index: 20;
+    }
+
+    /* State 1: Intro Splash Layer */
+    #intro-layer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      background-color: var(--bg-color);
+    }
+    
+    #intro-layer.active {
+      z-index: 110;
+    }
+
+    .intro-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 30px;
+      text-align: center;
+      position: relative;
+      z-index: 3;
+    }
+
+    .logo-text {
+      font-size: 5rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.04em;
+      transform: translateZ(0);
+      will-change: transform, opacity, filter;
+      transition: transform 1.2s cubic-bezier(0.8, 0, 0.2, 1), opacity 0.6s ease-in 0.4s, filter 0.6s ease-in;
+    }
+
+    .logo-text span {
+      display: inline-block;
+    }
+
+    .logo-text .highlight {
+      color: var(--accent-cyan);
+      text-shadow: 0 0 50px rgba(6, 182, 212, 0.5);
+    }
+
+    /* Axiom Zoom transition */
+    .logo-text.zoom {
+      transform: scale(38) translateZ(0) !important;
+      opacity: 0 !important;
+      filter: blur(8px) !important;
+    }
+
+    .loader-container {
+      width: 320px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.02);
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    .loader-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(to right, var(--accent-cyan), #4f46e5);
+      box-shadow: 0 0 10px var(--accent-cyan-glow);
+      transition: width 0.1s linear;
+    }
+
+    .loader-status {
+      font-size: 10px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--text-secondary);
+      letter-spacing: 2.5px;
+      font-family: monospace;
+      height: 16px;
+      opacity: 0.8;
+    }
+
+    /* State 2: Main Dashboard Layer */
+    #dashboard-layer {
+      overflow-y: auto;
+      z-index: 10;
+    }
+
+    /* App Layout Container */
+    .app-container {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 30px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Glassmorphic Panel Elements */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 28px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--accent-cyan), #4f46e5);
+      border-radius: 12px;
+      box-shadow: 0 0 15px var(--accent-cyan-glow);
+    }
+
+    .brand-logo svg {
+      width: 26px;
+      height: 26px;
+      fill: var(--text-primary);
+    }
+
+    .brand-info h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(to right, #ffffff, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-info span {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      display: block;
+      margin-top: 1px;
+    }
+
+    .system-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .status-indicator {
+      width: 8px;
+      height: 8px;
+      background-color: var(--accent-green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-green);
+      animation: statusPulse 2s infinite;
+    }
+
+    @keyframes statusPulse {
+      0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    /* Dashboard Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+    }
+
+    @media (max-width: 820px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Monitor Panel container */
+    .monitor-panel {
+      background: var(--panel-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .panel-header {
+      padding: 22px 28px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-header h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .process-count-badge {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 10px;
+    }
+
+    /* List Container */
+    .process-list-wrapper {
+      padding: 24px;
+      overflow-y: auto;
+      max-height: 480px;
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Process Card */
+    .process-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 14px;
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      animation: cardAppear 0.5s cubic-bezier(0.2, 1, 0.2, 1) both;
+    }
+
+    @keyframes cardAppear {
+      0% { opacity: 0; transform: translateY(15px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .process-card:hover {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(6, 182, 212, 0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Kill Fade-Out */
+    .process-card.terminating {
+      transform: translateX(120%) scale(0.92);
+      opacity: 0;
+      margin-bottom: -78px;
+      pointer-events: none;
+    }
+
+    .process-info-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .process-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+    }
+
+    .process-icon svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+
+    .process-meta h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .process-meta span {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 3px;
+    }
+
+    .process-stats {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .process-memory {
+      font-family: monospace;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      margin-right: 6px;
+    }
+
+    .btn-action {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-secondary);
+      font-family: var(--font-family);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn-action.btn-kill {
+      background: rgba(239, 68, 68, 0.08);
+      border-color: rgba(239, 68, 68, 0.2);
+      color: var(--accent-red);
+    }
+
+    .btn-action.btn-kill:hover {
+      background: var(--accent-red);
+      color: white;
+      box-shadow: 0 0 12px var(--accent-red-glow);
+    }
+
+    .btn-action.btn-whitelist:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Right Panel Container */
+    .controls-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .stat-card {
+      background: var(--panel-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .circular-progress-wrapper {
+      position: relative;
+      width: 170px;
+      height: 170px;
+      margin: 12px 0 24px 0;
+    }
+
+    .circular-progress-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.02);
+      stroke-width: 12px;
+    }
+
+    .circular-progress-fill {
+      fill: none;
+      stroke: url(#cyan-gradient);
+      stroke-width: 12px;
+      stroke-linecap: round;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+      stroke-dasharray: 440;
+      stroke-dashoffset: 440;
+      transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .circular-progress-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .circular-progress-value {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      color: var(--text-primary);
+    }
+
+    .circular-progress-unit {
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--text-secondary);
+      letter-spacing: 1px;
+      margin-top: -2px;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    /* Actions Panel Card */
+    .actions-card {
+      background: var(--panel-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .threshold-value {
+      color: var(--accent-cyan);
+      font-family: monospace;
+      font-weight: 700;
+    }
+
+    .custom-range {
+      width: 100%;
+      -webkit-appearance: none;
+      background: rgba(255, 255, 255, 0.05);
+      height: 6px;
+      border-radius: 3px;
+      outline: none;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .custom-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      box-shadow: 0 0 10px var(--accent-cyan-glow);
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+
+    .custom-range::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    .btn-block {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      font-family: var(--font-family);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-cyan), #4f46e5);
+      color: white;
+      box-shadow: 0 4px 15px rgba(6, 182, 212, 0.25);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .btn-primary:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: var(--accent-red);
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background: var(--accent-red);
+      color: white;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .btn-danger:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn-danger:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      border-color: rgba(255,255,255,0.05);
+      color: var(--text-secondary);
+      background: rgba(255,255,255,0.02);
+    }
+
+    /* Radar Sweeper Animation */
+    .radar-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 50px 0;
+      gap: 20px;
+      flex: 1;
+    }
+
+    .radar-circle {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 1px solid rgba(6, 182, 212, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .radar-circle::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 1px solid rgba(6, 182, 212, 0.08);
+      transform: scale(1.5);
+    }
+
+    .radar-circle::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 1px solid rgba(6, 182, 212, 0.04);
+      transform: scale(2);
+    }
+
+    .radar-sweep {
+      position: absolute;
+      width: 50%;
+      height: 50%;
+      background: linear-gradient(45deg, rgba(6, 182, 212, 0.15) 0%, transparent 70%);
+      top: 0;
+      left: 0;
+      transform-origin: bottom right;
+      border-right: 1.5px solid var(--accent-cyan);
+      border-top-left-radius: 100%;
+      animation: sweep 2s linear infinite;
+    }
+
+    @keyframes sweep {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .radar-pulse {
+      width: 24px;
+      height: 24px;
+      background: var(--accent-cyan);
+      border-radius: 50%;
+      box-shadow: 0 0 15px var(--accent-cyan);
+      animation: radarThrob 1.5s ease-out infinite;
+    }
+
+    @keyframes radarThrob {
+      0% { transform: scale(0.8); opacity: 0.5; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(0.8); opacity: 0.5; }
+    }
+
+    .radar-text {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      animation: pulseText 1.5s ease-in-out infinite;
+      letter-spacing: 0.5px;
+    }
+
+    @keyframes pulseText {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    /* Swept State View */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      text-align: center;
+      gap: 16px;
+      flex: 1;
+      animation: fadeUp 0.5s cubic-bezier(0.2, 1, 0.2, 1) both;
+    }
+
+    .empty-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-green);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
+      margin-bottom: 10px;
+    }
+
+    .empty-icon svg {
+      width: 34px;
+      height: 34px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.5;
+    }
+
+    .empty-state h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .empty-state p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      max-width: 350px;
+      line-height: 1.55;
+    }
+
+    /* Target Tags Chips */
+    .target-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .chip {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      padding: 4px 10px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .chip-active {
+      border-color: rgba(6, 182, 212, 0.2);
+      color: var(--accent-cyan);
+      background: rgba(6, 182, 212, 0.02);
+    }
+
+    .chip-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+    }
+
+    .chip-delete {
+      font-size: 11px;
+      margin-left: 4px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      line-height: 9px;
+      text-align: center;
+    }
+    
+    .chip-delete:hover {
+      color: var(--accent-red);
+    }
+
+    /* Toast Notifications Engine (Axiom Style) */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: rgba(10, 15, 30, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      padding: 14px 20px;
+      border-radius: 12px;
+      color: #fff;
+      min-width: 300px;
+      max-width: 400px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transform: translateY(40px);
+      opacity: 0;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      pointer-events: auto;
+      border-left: 4px solid var(--accent-cyan);
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast.success {
+      border-left-color: var(--accent-green);
+    }
+
+    .toast.error {
+      border-left-color: var(--accent-red);
+    }
+
+    .toast-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .toast-content h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .toast-content p {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+
+    /* Footer text */
+    footer {
+      text-align: center;
+      padding: 16px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.15);
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      border-top: 1px solid var(--border-color);
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  
+  <div class="liquid-bg show" id="persistent-liquid">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+  <div class="glass-overlay" id="persistent-glass"></div>
+
+  
+  <div id="intro-layer" class="layer active">
+    <div class="intro-content">
+      <h1 id="logo-text" class="logo-text">
+        <span>Ghost</span><span class="highlight">Busters</span>
+      </h1>
+      <div class="loader-container" id="loader-container">
+        <div class="loader-bar" id="loader-bar"></div>
+      </div>
+      <div class="loader-status" id="loader-status">Initializing system...</div>
+    </div>
+  </div>
+
+  
+  <div id="dashboard-layer" class="layer">
+    <div class="app-container">
+      
+      
+      <header>
+        <div class="brand">
+          <div class="brand-logo">
+            
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2A10 10 0 0 0 2 12v9a1 1 0 0 0 1.25.96l2.3-.62c.7-.18 1.45.1 1.86.72A3 3 0 0 0 10 23.5a3 3 0 0 0 2.59-1.44c.4-.62 1.16-.9 1.86-.72l2.3.62A1 1 0 0 0 18 21v-9A10 10 0 0 0 8 2zm0 18a8 8 0 0 1-8-8v-6.7c0-2.3 1.8-4.3 4-4.3s4 2 4 4.3v1a1 1 0 0 0 2 0v-1c0-2.3 1.8-4.3 4-4.3s4 2 4 4.3V12A8 8 0 0 1 12 20zm-3-8a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0zm5 0a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0z"/>
+            </svg>
+          </div>
+          <div class="brand-info">
+            <h1>GhostBusters-PC</h1>
+            <span>PC Memory Optimizer & Sweep Utility</span>
+          </div>
+        </div>
+        
+        <div class="system-status">
+          <div class="status-indicator"></div>
+          <span>MONITOR ACTIVE</span>
+        </div>
+      </header>
+
+      
+      <div class="dashboard-grid">
+        
+        
+        <div class="monitor-panel">
+          <div class="panel-header">
+            <h2>Orphaned Background Tasks</h2>
+            <span class="process-count-badge" id="process-count">0 Detected</span>
+          </div>
+
+          <div class="process-list-wrapper" id="process-list">
+            
+          </div>
+        </div>
+
+        
+        <div class="controls-panel">
+          
+          
+          <div class="stat-card">
+            <span class="stat-label">Reclaimable Memory</span>
+            
+            <div class="circular-progress-wrapper">
+              <svg width="170" height="170" viewBox="0 0 170 170">
+                <defs>
+                  <linearGradient id="cyan-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#06b6d4" />
+                    <stop offset="100%" stop-color="#4f46e5" />
+                  </linearGradient>
+                </defs>
+                <circle class="circular-progress-bg" cx="85" cy="85" r="75" />
+                <circle class="circular-progress-fill" id="progress-fill" cx="85" cy="85" r="75" />
+              </svg>
+              <div class="circular-progress-text">
+                <span class="circular-progress-value" id="ram-value">0.00</span>
+                <span class="circular-progress-unit">MB</span>
+              </div>
+            </div>
+          </div>
+
+          
+          <div class="stat-card" style="margin-top: -12px; padding: 20px 24px; align-items: flex-start; justify-content: flex-start; width: 100%;">
+            <div style="display: flex; justify-content: space-between; width: 100%; font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px;">
+              <span>System Memory Load</span>
+              <span id="system-ram-percentage">0%</span>
+            </div>
+            <div style="width: 100%; height: 8px; background: rgba(255, 255, 255, 0.05); border-radius: 4px; overflow: hidden; margin-bottom: 8px; border: 1px solid rgba(255, 255, 255, 0.02);">
+              <div id="system-ram-fill" style="width: 0%; height: 100%; background: linear-gradient(to right, var(--accent-cyan), #4f46e5); border-radius: 4px; transition: width 1s ease;"></div>
+            </div>
+            <span id="system-ram-details" style="font-size: 11px; color: var(--text-secondary); font-family: monospace;">0.00 GB / 0.00 GB Used</span>
+          </div>
+
+          
+          <div class="actions-card">
+            
+            
+            <div class="slider-group">
+              <div class="slider-header">
+                <span>RAM Filter Threshold</span>
+                <span class="threshold-value" id="threshold-label">20 MB</span>
+              </div>
+              <input type="range" class="custom-range" id="threshold-slider" min="10" max="300" step="5" value="20">
+            </div>
+
+            <button class="btn-block btn-primary" id="btn-scan">
+              
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              Scan Background
+            </button>
+
+            <button class="btn-block btn-danger" id="btn-purge-all" disabled>
+              
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+              </svg>
+              Clean All Ghost Apps
+            </button>
+
+            
+            <div style="margin-top: 5px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Scanning Targets</span>
+                <a href="#" id="toggle-target-input" style="font-size: 11px; color: var(--accent-cyan); text-decoration: none; font-weight: 600; cursor: pointer;">+ Add Target</a>
+              </div>
+              
+              
+              <div id="target-input-container" style="display: none; margin-bottom: 12px; gap: 8px; animation: cardAppear 0.3s ease-out;">
+                <input type="text" id="custom-target-input" placeholder="e.g. firefox, steam" style="flex: 1; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 8px; padding: 6px 10px; font-size: 12px; color: white; outline: none; font-family: var(--font-family);">
+                <button id="btn-add-target" style="background: var(--accent-cyan); border: none; border-radius: 8px; padding: 0 14px; color: black; font-size: 12px; font-weight: 700; cursor: pointer;">Add</button>
+              </div>
+
+              <div class="target-chips" id="target-list">
+                
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <footer>
+        GHOSTBUSTERS-PC UTILITY v1.0.0 &bull; OPEN-SOURCE HACKATHON MVP
+      </footer>
+
+    </div>
+  </div>
+
+  
+  <div id="toast-container" class="toast-container"></div>
+
+  <script>
+    const state = {
+      processes: [],
+      threshold: 20,
+      scanning: false,
+      targets: ["chrome", "msedge", "node", "java", "discord", "code"],
+      whitelist: new Set()
+    };
+
+    const elements = {
+      btnScan: document.getElementById('btn-scan'),
+      btnPurgeAll: document.getElementById('btn-purge-all'),
+      processList: document.getElementById('process-list'),
+      processCount: document.getElementById('process-count'),
+      ramValue: document.getElementById('ram-value'),
+      progressFill: document.getElementById('progress-fill'),
+      thresholdSlider: document.getElementById('threshold-slider'),
+      thresholdLabel: document.getElementById('threshold-label'),
+      targetList: document.getElementById('target-list'),
+      systemRamPercent: document.getElementById('system-ram-percentage'),
+      systemRamFill: document.getElementById('system-ram-fill'),
+      systemRamDetails: document.getElementById('system-ram-details'),
+      toggleTargetInput: document.getElementById('toggle-target-input'),
+      targetInputContainer: document.getElementById('target-input-container'),
+      customTargetInput: document.getElementById('custom-target-input'),
+      btnAddTarget: document.getElementById('btn-add-target')
+    };
+
+    function init() {
+      elements.thresholdSlider.addEventListener('input', (e) => {
+        state.threshold = parseInt(e.target.value);
+        elements.thresholdLabel.textContent = `${state.threshold} MB`;
+      });
+
+      elements.thresholdSlider.addEventListener('change', () => {
+        scanProcesses();
+      });
+
+      elements.toggleTargetInput.addEventListener('click', (e) => {
+        e.preventDefault();
+        const isHidden = elements.targetInputContainer.style.display === 'none';
+        elements.targetInputContainer.style.display = isHidden ? 'flex' : 'none';
+        if (isHidden) {
+          elements.customTargetInput.focus();
+        }
+      });
+
+      elements.btnAddTarget.addEventListener('click', addCustomTarget);
+      elements.customTargetInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') addCustomTarget();
+      });
+
+      elements.btnScan.addEventListener('click', scanProcesses);
+      elements.btnPurgeAll.addEventListener('click', purgeAllProcesses);
+
+      renderTargets();
+
+      runSplash();
+    }
+
+    function showToast(title, message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+
+      let icon = '';
+      if (type === 'success') {
+        icon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+      } else if (type === 'error') {
+        icon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+      } else {
+        icon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+      }
+
+      toast.innerHTML = `
+        <div class="toast-icon">${icon}</div>
+        <div class="toast-content">
+          <h4>${title}</h4>
+          <p>${message}</p>
+        </div>
+      `;
+
+      container.appendChild(toast);
+
+      toast.offsetHeight;
+      toast.classList.add('show');
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+          toast.remove();
+        }, 400);
+      }, 4000);
+    }
+
+    function runSplash() {
+      const loaderBar = document.getElementById('loader-bar');
+      const loaderStatus = document.getElementById('loader-status');
+      const introLayer = document.getElementById('intro-layer');
+      const logoText = document.getElementById('logo-text');
+      const dashboardLayer = document.getElementById('dashboard-layer');
+
+      const statuses = [
+        { progress: 15, text: "CONNECTING BACKEND SERVER..." },
+        { progress: 30, text: "ACQUIRING PROCESS HEURISTICS..." },
+        { progress: 50, text: "INITIALIZING WIN32 CT-APIs..." },
+        { progress: 70, text: "POPULATING SCANNING TARGETS..." },
+        { progress: 85, text: "OPTIMIZING RAM THRESHOLD FILTER..." },
+        { progress: 100, text: "GHOSTBUSTER SWEEP ENGINE READY" }
+      ];
+
+      let currentStep = 0;
+
+      const interval = setInterval(() => {
+        if (currentStep >= statuses.length) {
+          clearInterval(interval);
+
+          setTimeout(() => {
+            logoText.classList.add('zoom');
+            introLayer.style.opacity = '0';
+            introLayer.style.pointerEvents = 'none';
+
+            dashboardLayer.classList.add('active');
+
+            setTimeout(() => {
+              introLayer.remove();
+              scanProcesses();
+            }, 800);
+          }, 300);
+
+          return;
+        }
+
+        const step = statuses[currentStep];
+        loaderBar.style.width = `${step.progress}%`;
+        loaderStatus.textContent = step.text;
+        currentStep++;
+      }, 350);
+    }
+
+    function addCustomTarget() {
+      const val = elements.customTargetInput.value.trim().toLowerCase();
+      if (!val) return;
+
+      const cleanVal = val.endsWith('.exe') ? val.substring(0, val.length - 4) : val;
+
+      if (state.targets.includes(cleanVal)) {
+        showToast("Already Registered", `"${cleanVal}" is already on your targets list.`, "info");
+        elements.customTargetInput.value = '';
+        return;
+      }
+
+      state.targets.push(cleanVal);
+      renderTargets();
+      showToast("Target Added", `Scanning database for background instances of "${cleanVal}".`, "success");
+      elements.customTargetInput.value = '';
+      elements.targetInputContainer.style.display = 'none';
+
+      scanProcesses();
+    }
+
+    function deleteTarget(targetName) {
+      state.targets = state.targets.filter(t => t !== targetName);
+      renderTargets();
+      showToast("Target Removed", `Stopped scanning for background instances of "${targetName}".`, "info");
+      scanProcesses();
+    }
+
+    function renderTargets() {
+      elements.targetList.innerHTML = '';
+      state.targets.forEach(target => {
+        const chip = document.createElement('div');
+        chip.className = 'chip chip-active';
+        chip.innerHTML = `
+          <span class="chip-dot"></span>
+          ${target}
+          <span class="chip-delete" onclick="deleteTarget('${target}')">&times;</span>
+        `;
+        elements.targetList.appendChild(chip);
+      });
+    }
+
+    function whitelistProcess(name, pid) {
+      state.whitelist.add(pid);
+      const card = document.getElementById(`proc-${pid}`);
+      if (card) {
+        card.classList.add('terminating');
+        showToast("Process Ignored", `Ignoring ${name} (PID: ${pid}) during this monitoring session.`, "info");
+
+        setTimeout(() => {
+          card.remove();
+          state.processes = state.processes.filter(p => p.pid !== pid);
+          elements.processCount.textContent = `${state.processes.length} Detected`;
+          const newTotal = state.processes.reduce((sum, p) => sum + p.memory, 0);
+          updateRamGauge(newTotal);
+
+          if (state.processes.length === 0) {
+            renderProcessList();
+          }
+        }, 350);
+      }
+    }
+
+    function updateRamGauge(reclaimableMb) {
+      animateCounter('ram-value', parseFloat(elements.ramValue.textContent) || 0, reclaimableMb, 800);
+
+      const maxEstimated = 1500;
+      const percentage = Math.min((reclaimableMb / maxEstimated) * 100, 100);
+      const strokeDashoffset = 440 - (440 * percentage) / 100;
+      elements.progressFill.style.strokeDashoffset = strokeDashoffset;
+    }
+
+    function animateCounter(id, start, end, duration) {
+      const obj = document.getElementById(id);
+      const range = end - start;
+      let current = start;
+      const increment = range / (duration / 16);
+      const step = () => {
+        current += increment;
+        if ((range > 0 && current >= end) || (range < 0 && current <= end)) {
+          obj.textContent = end.toFixed(2);
+        } else {
+          obj.textContent = current.toFixed(2);
+          requestAnimationFrame(step);
+        }
+      };
+      requestAnimationFrame(step);
+    }
+
+    function scanProcesses() {
+      if (state.scanning) return;
+      state.scanning = true;
+
+      elements.btnScan.disabled = true;
+      elements.btnPurgeAll.disabled = true;
+      elements.processList.innerHTML = `
+        <div class="radar-container">
+          <div class="radar-circle">
+            <div class="radar-sweep"></div>
+            <div class="radar-pulse"></div>
+          </div>
+          <span class="radar-text">Sweeping processes database...</span>
+        </div>
+      `;
+
+      const targetsQuery = state.targets.join(',');
+      fetch(`/api/scan?threshold=${state.threshold}&targets=${targetsQuery}`)
+        .then(response => response.json())
+        .then(data => {
+          const systemRam = data.system_ram;
+          const ghosts = data.ghosts;
+
+          state.processes = ghosts.filter(p => !state.whitelist.has(p.pid));
+
+          if (systemRam) {
+            elements.systemRamPercent.textContent = `${systemRam.percent}%`;
+            elements.systemRamFill.style.width = `${systemRam.percent}%`;
+            elements.systemRamDetails.textContent = `${systemRam.used_gb.toFixed(2)} GB / ${systemRam.total_gb.toFixed(1)} GB Used`;
+          }
+
+          renderProcessList();
+        })
+        .catch(err => {
+          console.error("Scanning failed", err);
+          elements.processList.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon" style="background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.15); color: var(--accent-red)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+              </div>
+              <h3>API Connection Lost</h3>
+              <p>Unable to connect to the GhostBusters backend scanner. Please verify the application backend server is running.</p>
+            </div>
+          `;
+          updateRamGauge(0);
+          elements.processCount.textContent = 'Connection Error';
+        })
+        .finally(() => {
+          state.scanning = false;
+          elements.btnScan.disabled = false;
+        });
+    }
+
+    function renderProcessList() {
+      elements.processList.innerHTML = '';
+      const count = state.processes.length;
+      elements.processCount.textContent = `${count} Detected`;
+
+      if (count === 0) {
+        elements.processList.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">
+              <svg viewBox="0 0 24 24">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+            </div>
+            <h3>System is Swept & Clean!</h3>
+            <p>No windowless background targets exceeding the RAM filters are currently active.</p>
+          </div>
+        `;
+        elements.btnPurgeAll.disabled = true;
+        updateRamGauge(0);
+        return;
+      }
+
+      elements.btnPurgeAll.disabled = false;
+      let totalRam = 0;
+
+      state.processes.forEach((proc, idx) => {
+        totalRam += proc.memory;
+        const card = document.createElement('div');
+        card.className = 'process-card';
+        card.id = `proc-${proc.pid}`;
+        card.style.animationDelay = `${idx * 0.08}s`;
+
+        const procName = proc.name.toLowerCase();
+        let iconSvg = '';
+        if (procName.includes('chrome')) {
+          iconSvg = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 8h8M12 16L5.07 4M12 8l-6.93 12"/></svg>`;
+        } else if (procName.includes('edge')) {
+          iconSvg = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 8h8M12 16L5.07 4M12 8l-6.93 12"/></svg>`;
+        } else if (procName.includes('node')) {
+          iconSvg = `<svg viewBox="0 0 24 24"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/><line x1="12" y1="22" x2="12" y2="12"/><line x1="22" y1="8.5" x2="12" y2="12"/><line x1="2" y1="8.5" x2="12" y2="12"/></svg>`;
+        } else if (procName.includes('java')) {
+          iconSvg = `<svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10z"/></svg>`;
+        } else {
+          iconSvg = `<svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`;
+        }
+
+        card.innerHTML = `
+          <div class="process-info-group">
+            <div class="process-icon">
+              ${iconSvg}
+            </div>
+            <div class="process-meta">
+              <h3>${proc.name}</h3>
+              <span>PID: ${proc.pid} &bull; Parent: ${proc.parent_name || 'None'} (${proc.parent_pid})</span>
+            </div>
+          </div>
+          <div class="process-stats">
+            <span class="process-memory">${proc.memory.toFixed(1)} MB</span>
+            <button class="btn-action btn-whitelist" onclick="whitelistProcess('${proc.name}', ${proc.pid})">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+              Ignore
+            </button>
+            <button class="btn-action btn-kill" onclick="terminateSingle(${proc.pid}, '${proc.name}', ${proc.memory})">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              Kill
+            </button>
+          </div>
+        `;
+
+        elements.processList.appendChild(card);
+      });
+
+      updateRamGauge(totalRam);
+    }
+
+    function terminateSingle(pid, name, memory) {
+      const card = document.getElementById(`proc-${pid}`);
+      if (!card) return;
+
+      card.classList.add('terminating');
+
+      fetch(`/api/terminate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pid: pid })
+      })
+      .then(response => response.json())
+      .then(result => {
+        if (result.success) {
+          state.processes = state.processes.filter(p => p.pid !== pid);
+
+          setTimeout(() => {
+            card.remove();
+            elements.processCount.textContent = `${state.processes.length} Detected`;
+            const newTotalRam = state.processes.reduce((sum, p) => sum + p.memory, 0);
+            updateRamGauge(newTotalRam);
+
+            showToast("RAM Reclaimed", `Successfully force-closed ${name} (PID: ${pid}) and freed ${memory.toFixed(1)} MB!`, "success");
+
+            setTimeout(scanProcesses, 200);
+          }, 350);
+        } else {
+          card.classList.remove('terminating');
+          showToast("Access Denied", `Failed to terminate ${name} (PID: ${pid}). Requires administrative rights.`, "error");
+        }
+      })
+      .catch(err => {
+        console.error("Termination request failed", err);
+        card.classList.remove('terminating');
+      });
+    }
+
+    function purgeAllProcesses() {
+      if (state.processes.length === 0) return;
+
+      const totalKills = state.processes.length;
+      const totalSaved = state.processes.reduce((sum, p) => sum + p.memory, 0);
+
+      elements.btnPurgeAll.disabled = true;
+      elements.btnScan.disabled = true;
+
+      const cards = document.querySelectorAll('.process-card');
+      cards.forEach(card => card.classList.add('terminating'));
+
+      fetch(`/api/terminate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ all: true })
+      })
+      .then(response => response.json())
+      .then(result => {
+        if (result.success) {
+          setTimeout(() => {
+            state.processes = [];
+            renderProcessList();
+            showToast("Sweep Complete", `Successfully terminated ${totalKills} ghost apps and reclaimed ${totalSaved.toFixed(1)} MB of RAM!`, "success");
+
+            setTimeout(scanProcesses, 200);
+          }, 400);
+        } else {
+          showToast("Sweep Error", `Bulk termination failed: ${result.error}`, "error");
+          scanProcesses();
+        }
+      })
+      .catch(err => {
+        console.error("Bulk termination failed", err);
+        scanProcesses();
+      })
+      .finally(() => {
+        elements.btnScan.disabled = false;
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Python Cache and Compiled Files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# PyInstaller / Build Artifacts
+build/
+dist/
+*.spec
+
+# IDEs
+.vscode/
+.idea/
+.project
+.pydevproject
+
+# System Files
+.DS_Store
+Thumbs.db
