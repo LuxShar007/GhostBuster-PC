@@ -31,7 +31,7 @@ Python, HTML, CSS, JavaScript, PyWebView, ctypes (Win32 APIs), psutil, PyInstall
 https://github.com/LuxShar007/GhostBuster-PC
 
 **Live Demo Link:**  
-N/A (Desktop Application: This software runs exclusively as a desktop application (.exe) or local Python script, utilizing a local API key environment rather than a hosted web app).
+N/A (Desktop Application: This software runs exclusively as a desktop application (.exe) or local Python script. It utilizes a local Python server to scan and terminate processes via native operating system APIs rather than a hosted web app).
 
 **Presentation / Demo Video Link:**  
 <!-- Optional but recommended: Add presentation/demo video link here -->
