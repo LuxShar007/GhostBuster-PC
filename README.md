@@ -2,6 +2,12 @@
 
 > **GhostBuster-PC is a high-performance, cross-platform utility and glassmorphic desktop dashboard designed to identify and safely terminate orphaned, windowless background processes that silently hoard system resources. By surgically reclaiming leaked RAM from zombie instances of browser engines, runtime environments, and IDE helper processes, it instantly restores system performance without disrupting your active workspace.**
 
+<p align="center">
+  <a href="demo.mp4" target="_blank">
+    <img src="https://img.shields.io/badge/Play_Demo_Video-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Play Demo Video" />
+  </a>
+</p>
+
 ---
 
 ## ✨ Features
